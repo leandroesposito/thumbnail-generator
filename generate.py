@@ -109,6 +109,21 @@ def add_title(thumbnail, title):
 
     cv2.putText(thumbnail, title, position, font, font_scale, font_color, thickness, cv2.LINE_AA)
 
+def get_optimal_font_scale(height):
+    # reduce scale from 6.0 - 5.9 ... until miminum
+    # to check if text fits into height
+    # if none found, return minimum
+    # in this case 0.7 as minimun text scale
+    minimum = 7
+    for scale in reversed(range(minimum, 60)):
+        textSize = cv2.getTextSize("|", fontFace=cv2.FONT_HERSHEY_DUPLEX, fontScale=scale/10, thickness=1)
+        # * 5 is to calculate space needed for 3 lines and spaces between lines and above and below text
+        # so 3 lines + spaces = 5 lines without any spaces
+        new_height = textSize[0][1] * 5
+        if (new_height <= height):
+            return scale/10
+    return minimum / 10
+
 
 def add_video_info_section(video_path, img):
     # Load the image
@@ -130,19 +145,32 @@ def add_video_info_section(video_path, img):
     frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     dimentions = f"{frame_width}x{frame_height}"
 
-    # Create a blank section with the same width as the image
-    section_height = 30 * 4  # Adjust as needed
-    section = np.zeros((section_height, img.shape[1], 3), dtype=np.uint8)
+    # Set section height as 13% of original image height
+    section_height = int(img.shape[0] * 0.13)  # Adjust as needed
 
-    # Add text to the section
+    # Set text properties
+    font_scale = get_optimal_font_scale(section_height)
     font = cv2.FONT_HERSHEY_DUPLEX
-    font_scale = 0.7
     font_color = (255, 255, 255)  # White color
     thickness = 1
-    text_position = (10, 30)  # Position of the text
-    cv2.putText(section, f"Name: {name}", text_position, font, font_scale, font_color, thickness, cv2.LINE_AA)
-    cv2.putText(section, f"Duration: {duration} ({size}) {bitrate}kbps", (text_position[0], text_position[1] + 30), font, font_scale, font_color, thickness, cv2.LINE_AA)
-    cv2.putText(section, f"Resolution: {dimentions} {fps} FPS", (text_position[0], text_position[1] + 60), font, font_scale, font_color, thickness, cv2.LINE_AA)
+
+    # Space between lines
+    # spacing * 1 = first line Y position
+    # spacing * 2 = second line Y position
+    spacing = int(section_height // 3.5)
+
+    # Create a blank section with the same width as the image
+    # Update section height in case minimum text size don't fit in the 13%
+    # * 5 is to calculate space needed for 3 lines and spaces between lines and above and below text
+    # so 3 lines + spaces = 5 lines without any spaces
+    section_height = max(section_height, cv2.getTextSize("|", fontFace=cv2.FONT_HERSHEY_DUPLEX, fontScale=font_scale, thickness=1)[0][1] * 5)
+    section = np.zeros((section_height, img.shape[1], 3), dtype=np.uint8)
+
+    # Write text on new section
+    # spacing // 2 is because text top is not exactly in the middle so it can't be use as left as it is
+    cv2.putText(section, f"Name: {name}", (spacing // 2, spacing), font, font_scale, font_color, thickness, cv2.LINE_AA)
+    cv2.putText(section, f"Duration: {duration} ({size}) {bitrate}kbps", (spacing // 2, spacing * 2), font, font_scale, font_color, thickness, cv2.LINE_AA)
+    cv2.putText(section, f"Resolution: {dimentions} {fps} FPS", (spacing // 2, spacing * 3), font, font_scale, font_color, thickness, cv2.LINE_AA)
 
     # Combine the image and section
     composite_image = np.vstack((section, img))
