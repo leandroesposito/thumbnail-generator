@@ -30,7 +30,8 @@ def extract_evenly_spaced_frames(video_path, n):
     fps = vidcap.get(cv2.CAP_PROP_FPS)
     frames_step = total_frames // (n + 2)
     result = []
-    video_height = vidcap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+    video_height = int(vidcap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    video_width = int(vidcap.get(cv2.CAP_PROP_FRAME_WIDTH))
 
     print(f"Extracting {n} frames")
     for i in tqdm(range(1, n + 1)):
@@ -44,7 +45,8 @@ def extract_evenly_spaced_frames(video_path, n):
             # cv2.imwrite(frame_filename, frame)
             # print(f"Saved frame {i+1}/{n} as {frame_filename}")
         else:
-            print(f"Error reading frame {i+1}/{n}")
+            result.append((np.zeros((video_height, video_width, 3), dtype=np.uint8), str(datetime.timedelta(seconds=int(frame_number / fps)))))
+            tqdm.write(f"Error reading frame {i+1}/{n}")
 
     vidcap.release()
     return result
