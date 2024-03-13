@@ -79,7 +79,6 @@ def merge_images_into_grid(image_list, rows, cols):
     font_color_2 = (0, 0, 0)
     thickness = 1
 
-
     for img, time in image_list:
         if common_height is None:
             common_height = img.shape[0]
