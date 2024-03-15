@@ -171,7 +171,7 @@ def add_video_info_section(video_path, img):
     # spacing // 2 is because text top is not exactly in the middle so it can't be use as left as it is
     cv2.putText(section, f"Name: {name}", (spacing // 2, spacing), font, font_scale, font_color, thickness, cv2.LINE_AA)
     cv2.putText(section, f"Duration: {duration} ({size}) {bitrate}kbps", (spacing // 2, spacing * 2), font, font_scale, font_color, thickness, cv2.LINE_AA)
-    cv2.putText(section, f"Resolution: {dimentions} {fps} FPS", (spacing // 2, spacing * 3), font, font_scale, font_color, thickness, cv2.LINE_AA)
+    cv2.putText(section, f"Resolution: {dimentions} {int(fps)} FPS", (spacing // 2, spacing * 3), font, font_scale, font_color, thickness, cv2.LINE_AA)
 
     # Combine the image and section
     composite_image = np.vstack((section, img))
