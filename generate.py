@@ -45,7 +45,13 @@ def extract_evenly_spaced_frames(video_path, n):
             # cv2.imwrite(frame_filename, frame)
             # print(f"Saved frame {i+1}/{n} as {frame_filename}")
         else:
-            result.append((np.zeros((video_height, video_width, 3), dtype=np.uint8), str(datetime.timedelta(seconds=int(frame_number / fps)))))
+            tqdm.write(f"Fail on {frame_number=}")
+            while not success and frame_number < total_frames:
+                frame_number += 1
+                vidcap.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
+                success, frame = vidcap.read()
+            result.append((frame, str(datetime.timedelta(seconds=int(frame_number / fps)))))
+            # result.append((np.zeros((video_height, video_width, 3), dtype=np.uint8), str(datetime.timedelta(seconds=int(frame_number / fps)))))
             tqdm.write(f"Error reading frame {i+1}/{n}")
 
     vidcap.release()
