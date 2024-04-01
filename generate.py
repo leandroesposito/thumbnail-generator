@@ -116,18 +116,21 @@ def add_title(thumbnail, title):
 
     cv2.putText(thumbnail, title, position, font, font_scale, font_color, thickness, cv2.LINE_AA)
 
-def get_optimal_font_scale(height):
+def get_optimal_font_scale(text, height, width):
     # reduce scale from 6.0 - 5.9 ... until miminum
     # to check if text fits into height
     # if none found, return minimum
     # in this case 0.7 as minimun text scale
     minimum = 7
     for scale in reversed(range(minimum, 60)):
-        textSize = cv2.getTextSize("|", fontFace=cv2.FONT_HERSHEY_DUPLEX, fontScale=scale/10, thickness=1)
+        textSize = cv2.getTextSize(text, fontFace=cv2.FONT_HERSHEY_DUPLEX, fontScale=scale/10, thickness=1)
         # * 5 is to calculate space needed for 3 lines and spaces between lines and above and below text
         # so 3 lines + spaces = 5 lines without any spaces
+        # getTextSize returns ((label_width, label_height), baseline)
         new_height = textSize[0][1] * 5
-        if (new_height <= height):
+        new_width = textSize[0][0]
+
+        if (new_height <= height and new_width <= width):
             return scale/10
     return minimum / 10
 
@@ -154,9 +157,10 @@ def add_video_info_section(video_path, img):
 
     # Set section height as 13% of original image height
     section_height = int(img.shape[0] * 0.13)  # Adjust as needed
+    section_width = img.shape[1]  # Adjust as needed
 
     # Set text properties
-    font_scale = get_optimal_font_scale(section_height)
+    font_scale = get_optimal_font_scale(f"Name: {name}", section_height, section_width)
     font = cv2.FONT_HERSHEY_DUPLEX
     font_color = (255, 255, 255)  # White color
     thickness = 1
