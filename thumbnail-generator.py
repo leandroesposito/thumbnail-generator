@@ -123,7 +123,8 @@ def get_optimal_font_scale(text, height, width):
     # in this case 0.7 as minimun text scale
     minimum = 7
     for scale in reversed(range(minimum, 60)):
-        textSize = cv2.getTextSize(text, fontFace=cv2.FONT_HERSHEY_DUPLEX, fontScale=scale/10, thickness=1)
+        # ".ext-" to add space for file extention
+        textSize = cv2.getTextSize(text + ".ext-", fontFace=cv2.FONT_HERSHEY_DUPLEX, fontScale=scale/10, thickness=1)
         # * 5 is to calculate space needed for 3 lines and spaces between lines and above and below text
         # so 3 lines + spaces = 5 lines without any spaces
         # getTextSize returns ((label_width, label_height), baseline)
