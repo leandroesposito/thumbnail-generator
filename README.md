@@ -19,9 +19,15 @@ options:
   --overwrite, -o       Overwrite existent thumbnails (default: False)
 ```
 ## Requirements
-```
-Python 3
 
+Install Python 3
+
+then run 
+```
+pip install -r /path/to/requirements.txt
+```
+or install these packages
+```
 numpy==1.23.3
 opencv_contrib_python==4.6.0.66
 tqdm==4.66.1
